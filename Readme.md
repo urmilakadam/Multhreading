@@ -1,36 +1,60 @@
-Executor Service
-Java.util.concurrent.ExecutorService interface is a new way of executing tasks asynchronously in the background. An executor service is very similar to thread pool.
+# Multithreading in Java
 
-   ExecutorService executorService = Executors.newSingleThreadExecutor();
+This repository demonstrates the use of multithreading in Java, focusing on various methods for creating and managing threads using the `ExecutorService` interface and inter-thread communication techniques.
 
-    executorService.execute(new Runnable() {
-        @Override
-        public void run() {
-            System.out.println("executor service");
-        }
-    });
-}
+## Overview
 
-Ways to create Thread:
-1.    ExecutorService executorService = Executors.newSingleThreadExecutor();
-2.    ExecutorService executorService = Executors.newFixedThreadPool(10);
-3.    ExecutorService executorService = Executors.newScheduledThreadPool(10);
+Java's multithreading capabilities allow applications to perform multiple operations concurrently, improving performance and responsiveness. This repository provides practical examples of how to implement multithreading using the `ExecutorService`, which abstracts thread management and simplifies task execution.
 
-How to check whether an ExecutorService task executed successfully?
-We can use a Future to check the return value. 
+### Key Features
 
-    Future future = executorService.submit(new Runnable() {
-        @Override
-        public void run() {
-            System.out.println("executor service");
-        }
-    });
+#### Thread Creation Methods
+1. **Single Thread Executor**:
+   - The `newSingleThreadExecutor()` method creates an executor that uses a single worker thread to execute tasks. This ensures that tasks are executed sequentially, preserving the order of execution.
+   - Example:
+     ```java
+     ExecutorService executorService = Executors.newSingleThreadExecutor();
+     executorService.execute(() -> {
+         System.out.println("Task executed in single thread executor.");
+     });
+     ```
 
-    System.out.println(future.get()); //return null if task has finished successfully.
-}
+2. **Fixed Thread Pool**:
+   - The `newFixedThreadPool(int nThreads)` method creates a pool of fixed-size threads. If all threads are busy, additional tasks are queued until a thread becomes available, allowing efficient use of system resources.
+   - Example:
+     ```java
+     ExecutorService executorService = Executors.newFixedThreadPool(10);
+     executorService.submit(() -> {
+         System.out.println("Task executed in fixed thread pool.");
+     });
+     ```
 
+3. **Scheduled Thread Pool**:
+   - The `newScheduledThreadPool(int corePoolSize)` method allows for the scheduling of tasks with a specified delay or periodic execution. This is useful for tasks that need to run at regular intervals.
+   - Example:
+     ```java
+     ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
+     scheduledExecutorService.scheduleAtFixedRate(() -> {
+         System.out.println("Periodic task executed.");
+     }, 0, 1, TimeUnit.SECONDS);
+     ```
 
-Inter-thread communication methods:
-1. Wait —> wait for another thread to notify
-2. Notify—> notify other waiting threads.
-3. notifyAll —> if more than one thread is in waiting then notify all the threads by using notifuAll method.
+#### Task Execution
+- Tasks can be submitted for execution using `execute()` or `submit()`. The `submit()` method returns a `Future` object that can be used to check if the task has completed and to retrieve its result.
+  ```java
+  Future<?> future = executorService.submit(() -> {
+      // Task implementation
+      return "Task result";
+  });
+  try {
+      System.out.println(future.get()); // Returns the task result
+  } catch (InterruptedException | ExecutionException e) {
+      e.printStackTrace();
+  }
+
+#### Inter-thread Communication
+Java provides several methods for inter-thread communication, which are essential for coordinating actions between multiple threads:
+
+- wait(): Causes the current thread to wait until another thread calls notify() or notifyAll().
+- notify(): Wakes up a single thread that is waiting on the object's monitor.
+- notifyAll(): Wakes up all threads that are waiting on the object's monitor.
